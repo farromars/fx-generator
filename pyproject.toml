@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "douyinfx"
+version = "0.1.0"
+description = "Web UI 工具：用 AI 模型生成抖音面部特效素材，配合 Effect Creator 上架"
+requires-python = ">=3.11"
+authors = [{ name = "douyin-fx" }]
+dependencies = [
+    "rembg",
+    "onnxruntime",
+    "Pillow",
+    "pydantic>=2",
+    "gradio>=5",
+    "openai>=1.0",
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = ["ruff"]
+
+[tool.setuptools.packages.find]
+include = ["douyinfx*", "lib*", "workflows*"]
+
+[project.scripts]
+douyinfx = "douyinfx.cli:main"

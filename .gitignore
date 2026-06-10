@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# 依赖
+.venv/
+venv/
+
+# 项目产物
+output/
+*.zip
+*.png
+!assets/*.png
+!**/*.md
+
+# 临时文件
+temp/
+tmp/
+*~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 敏感信息（不要提交 API Key）
+.codebuddy/models.json
+.env
+*.local.toml
+
+# 测试脚本
+_test_*.py
+_run_*.py
+install_deps.bat
+
+# 调试日志
+err.txt
+out.txt
+gradio_out.txt
