@@ -3,26 +3,47 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "douyinfx"
-version = "0.1.0"
-description = "Web UI 工具：用 AI 模型生成抖音面部特效素材，配合 Effect Creator 上架"
+name = "fxgen"
+version = "0.1.1"
+description = "面部特效素材生成工具：AI 出贴图 → 抠图 → 规范化 → 素材包，配合抖音 Douyin AR (Effect Creator) 上架"
 requires-python = ">=3.11"
-authors = [{ name = "douyin-fx" }]
+authors = [{ name = "farromars" }]
 dependencies = [
-    "rembg",
-    "onnxruntime",
-    "Pillow",
+    # ── 核心运行时 ──
+    "rembg>=2.0",
+    "onnxruntime>=1.17",
+    "Pillow>=10",
     "pydantic>=2",
     "gradio>=5",
-    "openai>=1.0",
-    "httpx",
+    "openai>=1.40",
+    "httpx>=0.27",
+    "click>=8",
+    "huggingface_hub>=0.24",
 ]
 
 [project.optional-dependencies]
-dev = ["ruff"]
-
-[tool.setuptools.packages.find]
-include = ["douyinfx*", "lib*", "workflows*"]
+# ── 本机推理（CUDA / mps）──
+# 注意：torch 不在这里固定，因为 Windows CUDA / macOS mps / Linux CUDA 需要
+# 不同的 wheel 源。请按 INSTALL-WINDOWS.md / INSTALL-MAC.md 单独装 torch 后再装这组。
+local = [
+    "diffusers>=0.30",
+    "transformers>=4.44",
+    "accelerate>=0.30",
+    "safetensors>=0.4",
+    "peft>=0.10",
+]
+dev = ["ruff>=0.5"]
 
 [project.scripts]
-douyinfx = "douyinfx.cli:main"
+fxgen = "app:launch"
+
+[tool.setuptools.packages.find]
+include = ["lib*", "workflows*", "scripts*"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]

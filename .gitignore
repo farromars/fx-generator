@@ -1,46 +1,55 @@
+# 输出目录（包内容由工具运行时生成，不入库）
+output/
+**/output/
+
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
-dist/
+*$py.class
+*.so
+.Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/python*
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+*.egg
+.installed.cfg
+.pytest_cache/
+.ruff_cache/
 
-# 依赖
+# 虚拟环境
 .venv/
 venv/
+env/
+ENV/
 
-# 项目产物
-output/
-*.zip
-*.png
-!assets/*.png
-!**/*.md
-
-# 临时文件
-temp/
-tmp/
-*~
+# OS
+.DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
 *.swp
+*.swo
+.codebuddy/
 
-# 系统
-.DS_Store
-Thumbs.db
+# 模型权重（绝对不入库）
+*.onnx
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.bin
 
-# 敏感信息（不要提交 API Key）
-.codebuddy/models.json
+# 用户敏感
 .env
-*.local.toml
-
-# 测试脚本
-_test_*.py
-_run_*.py
-install_deps.bat
-
-# 调试日志
-err.txt
-out.txt
-gradio_out.txt
+*.local

@@ -1,8 +1,9 @@
-"""OpenAI/DALL-E Provider。"""
+"""OpenAI / OpenAI 兼容 endpoint 的 Provider（DALL-E 3 / DALL-E 2 / GPT-image-1 / 兼容服务）。"""
+
+from __future__ import annotations
 
 import base64
 from pathlib import Path
-from typing import Literal
 
 from openai import OpenAI
 
@@ -10,10 +11,10 @@ from .base import BaseImageProvider, ProviderConfig
 
 
 class OpenAIProvider(BaseImageProvider):
-    """OpenAI DALL-E 图像生成 Provider。"""
+    """OpenAI 兼容图像生成 Provider。"""
 
     name = "openai"
-    display_name = "OpenAI (DALL-E 2/3, GPT-image-1)"
+    display_name = "OpenAI 兼容"
     supported_models = ["dall-e-3", "dall-e-2", "gpt-image-1"]
 
     supports_negative_prompt = False
@@ -22,7 +23,6 @@ class OpenAIProvider(BaseImageProvider):
     supports_n = True
     supports_response_format = True
 
-    # 尺寸限制
     VALID_SIZES = {
         "dall-e-3": ["1024x1024", "1792x1024", "1024x1792"],
         "dall-e-2": ["256x256", "512x512", "1024x1024"],
@@ -46,9 +46,9 @@ class OpenAIProvider(BaseImageProvider):
         seed: int | None = None,
         negative_prompt: str | None = None,
         output_dir: Path | None = None,
+        progress_cb=None,
     ) -> list[Path]:
-        """调用 OpenAI 图像生成 API。"""
-        model = model or "dall-e-3"
+        model = model or self.config.model or "dall-e-3"
 
         # DALL-E 3 限制 n=1
         if model == "dall-e-3":
@@ -56,7 +56,10 @@ class OpenAIProvider(BaseImageProvider):
 
         # 验证尺寸
         if size not in self.VALID_SIZES.get(model, []):
-            size = "1024x1024"  # 默认回退
+            size = "1024x1024"
+
+        if progress_cb:
+            progress_cb(0, n + 1, f"调用 OpenAI（{model}, n={n}, {size}）...")
 
         kwargs = {
             "model": model,
@@ -66,8 +69,6 @@ class OpenAIProvider(BaseImageProvider):
             "response_format": "b64_json",
         }
 
-        # OpenAI 不支持 negative_prompt 和 seed，忽略
-
         response = self.client.images.generate(**kwargs)
 
         if output_dir is None:
@@ -76,17 +77,21 @@ class OpenAIProvider(BaseImageProvider):
 
         paths: list[Path] = []
         for i, item in enumerate(response.data):
+            if progress_cb:
+                progress_cb(i + 1, n + 1, f"接收第 {i + 1}/{n} 张...")
             if item.b64_json:
                 img_data = base64.b64decode(item.b64_json)
-                path = output_dir / f"candidate_{i+1:02d}.png"
+                path = output_dir / f"candidate_{i + 1:02d}.png"
                 path.write_bytes(img_data)
                 paths.append(path)
             elif item.url:
                 import httpx
                 resp = httpx.get(item.url, timeout=60)
                 resp.raise_for_status()
-                path = output_dir / f"candidate_{i+1:02d}.png"
+                path = output_dir / f"candidate_{i + 1:02d}.png"
                 path.write_bytes(resp.content)
                 paths.append(path)
 
+        if progress_cb:
+            progress_cb(n + 1, n + 1, f"完成 {len(paths)} 张")
         return paths
