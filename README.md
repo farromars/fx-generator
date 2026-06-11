@@ -35,6 +35,8 @@
 
 请按 [`INSTALL-WINDOWS.md`](./INSTALL-WINDOWS.md) 走一遍。
 
+**装完后日常使用**：双击 `start.bat` 即可（自动设镜像、检查 Python、启动 UI、浏览器自动打开）。
+
 简略版：
 
 ```powershell
